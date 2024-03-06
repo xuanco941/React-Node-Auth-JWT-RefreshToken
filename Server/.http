@@ -1,0 +1,6 @@
+POST http://localhost:8080/api/auth/getAccessToken HTTP/1.1
+content-type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZTY5NDk5NDcwMWE1MDFjYzUwZDUzNSIsImlhdCI6MTcwOTcyMjMxNiwiZXhwIjoxNzA5ODA4NzE2fQ.vFVHrqp9blPsTLoHLtV3jQxPmHX3-AhAq27BPuXfdLQ"
+}
