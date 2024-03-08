@@ -65,7 +65,7 @@ const Login = () => {
         >
           <Form>
             <div className="form-group">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username" className="text-4xl">Username</label>
               <Field name="username" type="text" className="form-control" />
               <ErrorMessage
                 name="username"

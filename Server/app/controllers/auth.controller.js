@@ -95,7 +95,7 @@ exports.signin = (req, res) => {
         {
           algorithm: 'HS256',
           allowInsecureKeySizes: true,
-          expiresIn: 30, // 24 hours
+          expiresIn: 30, // 30s
         });
       const refreshToken = jwt.sign({ id: user.id },
         config.refreshSecret,
@@ -105,14 +105,14 @@ exports.signin = (req, res) => {
           expiresIn: 86400, // 24 hours
         });
 
-        let deviceLogin = new Device({deviceLogin: refreshToken});
-        deviceLogin.save((err, device) => {
-          if (err) {
-            console.error(err);
-          } else {
-            console.log(device);
-          } 
-        })
+      let deviceLogin = new Device({ deviceLogin: refreshToken });
+      deviceLogin.save((err, device) => {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log(device);
+        }
+      })
       var authorities = [];
 
       for (let i = 0; i < user.roles.length; i++) {
@@ -131,12 +131,11 @@ exports.signin = (req, res) => {
 
 exports.GetAccessToken = (req, res) => {
   const refreshToken = req.body.refreshToken;
-  console.log('refreshToken :'+ req.body.refreshToken);
-  console.log(config);
 
   if (!refreshToken) {
     return res.status(403).send({ message: 'Refresh token is required.' });
   }
+
 
   jwt.verify(refreshToken, config.refreshSecret, (err, decoded) => {
     console.log(decoded);
@@ -144,15 +143,24 @@ exports.GetAccessToken = (req, res) => {
       return res.status(401).send({ message: 'Invalid refresh token.' });
     }
 
-    // Generate a new access token
-    const newAccessToken = jwt.sign({ id: decoded.id },
-      config.secret,
-      {
-        algorithm: 'HS256',
-        allowInsecureKeySizes: true,
-        expiresIn: 30, // 30s
-      });
+    Device.findOne({ deviceLogin: refreshToken }, (err, obj) => {
+      if (err || !obj) {
+        return res.status(401).send({ message: 'Invalid refresh token.' });
+      }
+      else {
+        // Generate a new access token
+        const newAccessToken = jwt.sign({ id: decoded.id },
+          config.secret,
+          {
+            algorithm: 'HS256',
+            allowInsecureKeySizes: true,
+            expiresIn: 30, // 30s
+          });
 
-    res.status(200).send({ accessToken: newAccessToken });
+        return res.status(200).send({ accessToken: newAccessToken });
+      }
+    });
+
+
   });
 };
